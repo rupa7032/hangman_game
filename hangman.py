@@ -1,40 +1,43 @@
-# hangman.py
-from words import get_random_word
-class Hangman:
-    def __init__(self):
-        self.word = get_random_word()
-        self.guessed_letters = set()
-        self.attempts = 6
-    def display_word(self):
-        result = ""
-        for letter in self.word:
-            if letter in self.guessed_letters:
-                result += letter + " "
-            else:
-                result += "_ "
-        return result.strip()
-    def guess_letter(self, letter):
-        letter = letter.lower()
-        if len(letter) != 1 or not letter.isalpha():
-            return "Please enter only one letter."
+import random
+def play_hangman():
+    # Setup hidden word and game variables
+    words_pool = ["python", "developer", "program", "hangman", "coding"]
+    word = random.choice(words_pool)
+    guessed_letters = []
+    incorrect_guesses = 0
+    MAX_INCORRECT_GUESSES = 6
+    # Game loop running while guesses remain
+    while incorrect_guesses < MAX_INCORRECT_GUESSES:
+        # Generate the hidden word display (e.g., p _ t h _ n)
+        display_word = " ".join([letter if letter in guessed_letters else "_" for letter in word])
+        
+        print(f"\nWord: {display_word}")
+        print(f"Incorrect guesses remaining: {MAX_INCORRECT_GUESSES - incorrect_guesses}")
+        
+        # Check for win condition
+        if all(letter in guessed_letters for letter in word):
+            print(f"\nYou win! The word was '{word}'.")
+            return
 
-        if letter in self.guessed_letters:
-            return "You already guessed this letter."
+        # Get player input
+        guess = input("Guess a letter: ").strip().lower()
 
-        self.guessed_letters.add(letter)
-
-        if letter in self.word:
-            return f"Correct! '{letter}' is in the word."
+        # Validate input
+        if len(guess) != 1 or not guess.isalpha():
+            print("Please enter one letter.")
+        elif guess in guessed_letters:
+            print("You already guessed that letter.")
         else:
-            self.attempts -= 1
-            return f"Wrong! '{letter}' is not in the word."
+            guessed_letters.append(guess)
+            
+            if guess in word:
+                print("Good guess!")
+            else:
+                incorrect_guesses += 1
+                print("That letter is not in the word.")
 
-    def is_won(self):
-        return all(
-            letter in self.guessed_letters
-            for letter in self.word
-        )
-    def is_lost(self):
-        return self.attempts <= 0
-    def get_word(self):
-        return self.word
+    # If the loop finishes without returning, the player loses
+    print(f"\nGame over! The word was '{word}'.")
+
+if __name__ == "__main__":
+    play_hangman()
